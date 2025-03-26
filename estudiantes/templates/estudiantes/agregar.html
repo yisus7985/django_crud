@@ -1,0 +1,147 @@
+{% extends 'estudiantes/base.html' %}
+
+{% block title %}Agregar Estudiante{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <h2 class="page-title animate__animated animate__fadeInDown">
+            <i class="fas fa-user-plus me-2"></i>Agregar Nuevo Estudiante
+        </h2>
+        
+        <div class="card shadow-sm mb-4 animate__animated animate__fadeIn">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Formulario de Registro</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="studentForm" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="nombre" class="form-label">Nombre Completo</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese el nombre completo" required>
+                                <div class="invalid-feedback">
+                                    Por favor ingrese el nombre del estudiante.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="edad" class="form-label">Edad</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-birthday-cake"></i></span>
+                                <input type="number" class="form-control" id="edad" name="edad" min="1" max="120" placeholder="Edad" required>
+                                <div class="invalid-feedback">
+                                    Por favor ingrese una edad válida (1-120).
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="correo" class="form-label">Correo Electrónico</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-at"></i></span>
+                                <input type="email" class="form-control" id="correo" name="correo" placeholder="ejemplo@correo.com" required>
+                                <div class="invalid-feedback">
+                                    Por favor ingrese un correo electrónico válido.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mt-4">
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'lista_estudiantes' %}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save me-1"></i> Guardar Estudiante
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card bg-light animate__animated animate__fadeIn">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-lightbulb text-warning fs-3 me-3"></i>
+                    <div>
+                        <h5 class="mb-1">Consejos para el registro</h5>
+                        <ul class="mb-0">
+                            <li>Asegúrate de ingresar el nombre completo del estudiante.</li>
+                            <li>El correo electrónico debe ser válido y único.</li>
+                            <li>La edad debe ser un número entre 1 y 120.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Validación del formulario
+    (function() {
+        'use strict';
+        
+        const form = document.getElementById('studentForm');
+        
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                // Mostrar mensaje de error
+                showErrorMessage('Por favor complete todos los campos requeridos correctamente.');
+            } else {
+                // Mostrar mensaje de carga
+                Swal.fire({
+                    title: 'Guardando estudiante',
+                    html: 'Por favor espere...',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    willOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+            }
+            
+            form.classList.add('was-validated');
+        }, false);
+        
+        // Validación en tiempo real del email
+        const emailInput = document.getElementById('correo');
+        emailInput.addEventListener('input', function() {
+            const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+            
+            if (emailPattern.test(this.value)) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            }
+        });
+        
+        // Animación de los campos al hacer focus
+        const formInputs = document.querySelectorAll('.form-control');
+        formInputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.closest('.input-group').style.transform = 'translateX(5px)';
+                this.closest('.input-group').style.transition = 'transform 0.3s';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.closest('.input-group').style.transform = 'translateX(0)';
+            });
+        });
+    })();
+</script>
+{% endblock %}
